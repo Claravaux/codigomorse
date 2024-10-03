@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Generador de Bio en Código Morse con Audio</title>
+</head>
+<body>
+
+  <h1>Generador de Bio en Código Morse con Audio</h1>
+  <input type="text" id="inputText" placeholder="Ingresa tu texto aquí">
+  <button onclick="generateMorse()">Generar</button>
+
+  <p id="outputMorse"></p>
+
+  <script>
+    const morseMap = {
+  'a': 1,
+  'b': 2,
+  'c': 3,
+  'd': 4,
+  'e': 5,
+  'f': 6,
+  'g': 7,
+  'h': 8,
+  'i': 9,
+  'j': 10,
+  'k': 11,
+  'l': 12,
+  'm': 13,
+  'n': 14,
+  'o': 15,
+  'p': 16,
+  'q': 17,
+  'r': 18,
+  's': 19,
+  't': 20,
+  'u': 21,
+  'v': 22,
+  'w': 23,
+  'x': 24,
+  'y': 25,
+  'z': 26
+};
+
+
+    function beep(duration, frequency, volume) {
+      const context = new (window.AudioContext || window.webkitAudioContext)();
+      const oscillator = context.createOscillator();
+      const gainNode = context.createGain();
+
+      oscillator.frequency.value = frequency;
+      oscillator.type = "sine";
+
+      oscillator.connect(gainNode);
+      gainNode.connect(context.destination);
+
+      gainNode.gain.value = volume;
+
+      oscillator.start(context.currentTime);
+      oscillator.stop(context.currentTime + duration / 1000);
+    }
+
+    function playMorse(morseCode) {
+      let delay = 0;
+      const bipDuration = 300; // Duración de cada bip en ms
+
+      for (let char of morseCode) {
+        if (char === "bip") {
+          setTimeout(() => beep(bipDuration, 440, 1), delay);
+        }
+        delay += bipDuration + 100; // Añadir 100 ms de pausa entre bips
+      }
+    }
+
+    function generateMorse() {
+      const inputText = document.getElementById("inputText").value.toLowerCase();
+      let morseCode = [];
+
+      for (let char of inputText) {
+        if (morseMap[char]) {
+          for (let i = 0; i < morseMap[char]; i++) {
+            morseCode.push('bip');
+          }
+        }
+        morseCode.push(' '); // Espacio entre letras
+      }
+
+      document.getElementById("outputMorse").innerText = morseCode.join(' ').trim();
+      playMorse(morseCode);
+    }
+  </script>
+
+</body>
+</html>
